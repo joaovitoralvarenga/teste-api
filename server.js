@@ -13,3 +13,7 @@ app.use('/app', express.static(path.join(__dirname, '/public')))
 
 let port = process.env.PORT || 3000
 app.listen(port)
+
+const apiRouter = require('./api/routes/api_routes')
+
+app.use ('/api', apiRouter)
