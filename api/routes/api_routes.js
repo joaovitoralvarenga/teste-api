@@ -1,5 +1,5 @@
 const express = require ('express')
-const bycrypt = require('bycryptjs')
+const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 let apiRouter = express.Router()
 
