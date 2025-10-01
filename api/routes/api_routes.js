@@ -20,17 +20,16 @@ const knex = require('knex')({
 let checkToken = (req, res, next) => {
     let authToken = req.headers["authorization"]
     if (!authToken) {
-        res.status(401).json({ message: 'Token de acesso requerida' })
+        return res.status(401).json({ message: 'Token de acesso requerida' })
     }
-    else {
-        let token = authToken.split(' ')[1]
-        req.token = token
-    }
+    
+    let token = authToken.split(' ')[1]
+    req.token = token
 
     jwt.verify(req.token, process.env.SECRET_KEY, (err, decodeToken) => {
         if (err) {
-            res.status(401).json({ message: 'Acesso negado'})
-            return
+            return res.status(401).json({ message: 'Acesso negado'})
+           
         }
         req.usuarioId = decodeToken.id
         next()
@@ -53,11 +52,13 @@ let isAdmin = (req, res, next) => {
                     res.status(403).json({ message: 'Role de ADMIN requerida' })
                     return
                 }
+            } else {
+                req.status(404).json({message: 'Usuário não encontrado'})
             }
         })
         .catch (err => {
-        res.status(500).json({
-        message: 'Erro ao verificar roles de usuário - ' + err.message })
+             res.status(500).json({
+              message: 'Erro ao verificar roles de usuário - ' + err.message })
         })
 }
 
