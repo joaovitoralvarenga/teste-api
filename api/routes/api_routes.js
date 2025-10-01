@@ -174,35 +174,66 @@ apiRouter.post (endpoint + 'seguranca/register', (req, res) => {
 
 
 
-apiRouter.post(endpoint + 'seguranca/login', (req, res) => {
-    knex.select('*').from('usuario').where({ login: req.body.login })
-    .then(usuarios => {
-        if(usuarios.length){
-            let usuario = usuarios[0]
-            let checkSenha = bcrypt.compareSync(req.body.senha, usuario.senha)
-            if (checkSenha) {
-                var tokenJWT = jwt.sign({ id: usuario.id },
-                    process.env.SECRET_KEY, {
-                        expiresIn: 3600
+apiRouter.post('/seguranca/login', (req, res) => {
+    
+    // ✅ NOVO: Log para debug - ajuda a identificar problemas
+    console.log('🔐 Tentativa de login:', req.body.login)
+    
+    // ✅ NOVO: Validação de campos obrigatórios
+    if (!req.body.login || !req.body.senha) {
+        return res.status(400).json({ message: 'Login e senha são obrigatórios' })
+    }
+
+    knex
+        .select('*').from('usuario').where({ login: req.body.login })
+        .then(usuarios => {
+            if (usuarios.length) {
+                let usuario = usuarios[0]
+                let checkSenha = bcrypt.compareSync(req.body.senha, usuario.senha)
+                
+                if (checkSenha) {
+                    var tokenJWT = jwt.sign(
+                        { id: usuario.id },
+                        process.env.SECRET_KEY,
+                        { expiresIn: 3600 }
+                    )
+                    
+                    // ✅ NOVO: Log de sucesso
+                    console.log('✅ Login bem-sucedido:', usuario.login)
+                    
+                    // ✅ CORRIGIDO: Adicionado RETURN para evitar execução do código abaixo
+                    return res.status(200).json({
+                        id: usuario.id,
+                        login: usuario.login,
+                        nome: usuario.nome,
+                        roles: usuario.roles || 'USER', // ✅ NOVO: Fallback para 'USER' se roles estiver vazio
+                        token: tokenJWT
                     })
-                res.status(200).json({
-                    id: usuario.id,
-                    login: usuario.login,
-                    nome: usuario.nome,
-                    roles: usuario.roles,
-                    token: tokenJWT
-                })
-                return
+                } else {
+                    // ✅ NOVO: Log de senha incorreta
+                    console.log('❌ Senha incorreta para:', usuario.login)
+                }
+            } else {
+                // ✅ NOVO: Log de usuário não encontrado
+                console.log('❌ Usuário não encontrado:', req.body.login)
             }
-        }
-        res.status(401).json({ message: 'Login ou senha incorretos' })
-    })
-    .catch(err => {
-        res.status(500).json({
-            message: 'Erro ao verificar login - ' + err.message 
+            
+            // ❌ ANTES: res.status(200).json({ message: 'Login ou senha incorretos' })
+            // ⚠️ PROBLEMA: Status 200 indica SUCESSO! Mas o login falhou!
+            
+            // ✅ CORRIGIDO: Status 401 (Unauthorized) para login/senha incorretos
+            // Isso faz o frontend entrar no bloco catch ou tratar como erro
+            res.status(401).json({ message: 'Login ou senha incorretos' })
         })
-    })
+        .catch(err => {
+            // ✅ NOVO: Log de erro no console
+            console.error('❌ Erro no login:', err)
+            res.status(500).json({
+                message: 'Erro ao verificar login - ' + err.message
+            })
+        })
 })
+
 
 
 
