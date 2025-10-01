@@ -21,7 +21,7 @@ apiRouter.get(endpoint + 'produtos', (req, res) => {
     })
 })
 
-apiRouter.get(endpoint + 'produtos/:id', checkToken, (req, res) => {
+apiRouter.get(endpoint + 'produtos/:id', (req, res) => {
     knex.select('*').from('produto').where({ id: req.params.id })         
     .then(produtos => {
         if (produtos.length > 0) {                                            //Rota GET, para obter um produto a partir do ID
@@ -37,7 +37,7 @@ apiRouter.get(endpoint + 'produtos/:id', checkToken, (req, res) => {
     })
 })
 
-apiRouter.post(endpoint + 'produtos', checkToken, isAdmin, (req, res) => {   //Rota POST, para a criação de um produto, apenas admins tem acesso a ela.
+apiRouter.post(endpoint + 'produtos',  (req, res) => {   //Rota POST, para a criação de um produto, apenas admins tem acesso a ela.
     knex('produto')
     .insert({
         descricao: req.body.descricao,
@@ -55,7 +55,7 @@ apiRouter.post(endpoint + 'produtos', checkToken, isAdmin, (req, res) => {   //R
     })
 })
 
-apiRouter.put(endpoint + 'produtos/:id', checkToken, isAdmin, (req, res) => {  //Rota PUT, para atualização dos dados de um produto já existente. Apenas admins tem acesso a mesma.
+apiRouter.put(endpoint + 'produtos/:id', (req, res) => {  //Rota PUT, para atualização dos dados de um produto já existente. Apenas admins tem acesso a mesma.
     knex('produto')
     .where({ id: req.params.id })
     .update({
@@ -73,7 +73,7 @@ apiRouter.put(endpoint + 'produtos/:id', checkToken, isAdmin, (req, res) => {  /
     })
 })
 
-apiRouter.delete(endpoint + 'produtos/:id', checkToken, isAdmin, (req, res) => {  //Rota DELETE, remove uma instância e suas informações do banco de dados.
+apiRouter.delete(endpoint + 'produtos/:id', (req, res) => {  //Rota DELETE, remove uma instância e suas informações do banco de dados.
     knex('produto')
     .where({ id: req.params.id })
     .del()
