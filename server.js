@@ -11,6 +11,16 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use('/app', express.static(path.join(__dirname, '/public')))
 
+app.get('/', (req, res) => {
+    res.json({
+        message: '🎯 API de Produtos está rodando!',
+        timestamp: new Date().toISOString(),
+        version: '1.0.0',
+        status: 'online'
+    })
+})
+
+
 let PORT = process.env.PORT || 3000
 app.listen(PORT)
 
