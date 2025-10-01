@@ -78,7 +78,7 @@ apiRouter.get(endpoint + 'produtos', checkToken, (req, res) => {
             message: 'Erro ao recuperar produtos - ' + err.message })
     })
 })
-
+    
 apiRouter.get(endpoint + 'produtos/:id', checkToken,(req, res) => {
     knex.select('*').from('produto').where({ id: req.params.id })         
     .then(produtos => {

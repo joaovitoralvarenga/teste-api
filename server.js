@@ -17,8 +17,9 @@ app.get('/', (req, res) => {
         timestamp: new Date().toISOString(),
         version: '1.0.0',
         status: 'online'
-    })
+    })  
 })
+
 
 
 let PORT = process.env.PORT || 3000

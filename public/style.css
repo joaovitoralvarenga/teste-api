@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
 * {
     margin: 0;
     padding: 0;
@@ -5,28 +7,52 @@
 }
 
 body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-color: #FFFFFF;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 20px;
     min-height: 100vh;
     color: white;
+  
 }
+
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
 }
 
-h1 {
-    text-align: center;
-    font-size: 2.5em;
-    margin-bottom: 30px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+/* Header */
+.header {
+    width: 100%;
+    background-color: #1F2733;
+    padding: 15px 30px;
+    display: flex;  
+    justify-content: center;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  
 }
+
+.header h1 {
+    margin: 0;
+    font-family:Roboto, sans-serif;
+    font-weight: 600;
+    text-align: center;
+}
+
+p {
+    text-align: center;
+    margin: 30px;
+    margin-top: 30px;
+    color: #1F2733;
+}
+
+
 
 /* Login Section */
 .login-section {
-    background: rgba(255, 255, 255, 0.1);
+    background-color: #ebebeb;
     padding: 30px;
     border-radius: 15px;
     backdrop-filter: blur(10px);
@@ -37,7 +63,7 @@ h1 {
 
 .login-section h2 {
     margin-bottom: 20px;
-    color: #FFE066;
+    color: black;
 }
 
 .login-section form {
@@ -68,8 +94,8 @@ button {
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: linear-gradient(45deg, #4CAF50, #45a049);
-    color: white;
+    background: #FFC64A;
+    color: black;
 }
 
 button:hover {
@@ -97,10 +123,11 @@ button:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    color:#1F2733;
 }
 
 .logout-btn {
-    background: linear-gradient(45deg, #f44336, #d32f2f);
+    background-color: #FFC64A;;
     padding: 8px 15px;
     font-size: 14px;
 }
@@ -110,7 +137,7 @@ button:hover {
     background: rgba(0, 0, 0, 0.2);
     padding: 20px;
     border-radius: 10px;
-    border-left: 4px solid #4CAF50;
+    border-left: #FFC64A;
 }
 
 .status.error {
@@ -119,15 +146,15 @@ button:hover {
 
 /* Product Form */
 .product-form {
-    background: rgba(255, 255, 255, 0.1);
+    background:#ebebeb;
     padding: 20px;
     border-radius: 10px;
-    border-left: 4px solid #FFE066;
+    border-left: 4px solid #000000;
 }
 
 .product-form h3 {
     margin-bottom: 15px;
-    color: #FFE066;
+    color: #000000;
 }
 
 .product-form form {
@@ -139,14 +166,15 @@ button:hover {
 
 /* Products Section */
 .products-section h3 {
-    color: #FFE066;
+    color: #000000;
     margin-bottom: 15px;
 }
 
 .refresh-btn {
-    background: linear-gradient(45deg, #2196F3, #1976D2);
+    background: #1F2733;
     margin-bottom: 20px;
     padding: 10px 20px;
+    color: white;
 }
 
 .products-grid {
@@ -156,11 +184,11 @@ button:hover {
 }
 
 .product-card {
-    background: rgba(255, 255, 255, 0.1);
+    background: #ebebeb;
     padding: 20px;
     border-radius: 10px;
     backdrop-filter: blur(10px);
-    border-left: 4px solid #4CAF50;
+    border-left: 4px solid #1F2733;
     transition: transform 0.3s ease;
 }
 
@@ -169,7 +197,7 @@ button:hover {
 }
 
 .product-card h4 {
-    color: #FFE066;
+    color: #000000;
     margin-bottom: 10px;
     font-size: 1.2em;
 }
@@ -177,14 +205,15 @@ button:hover {
 .product-card .price {
     font-size: 1.5em;
     font-weight: bold;
-    color: #4CAF50;
+    color: #FFC64A;
     margin: 10px 0;
 }
 
 .product-card .brand {
-    color: #ccc;
+    color: #000000;
     font-style: italic;
     margin-bottom: 15px;
+    
 }
 
 .product-actions {
@@ -200,9 +229,10 @@ button:hover {
 }
 
 .delete-btn {
-    background: linear-gradient(45deg, #f44336, #d32f2f);
+    background: #1F2733;
     padding: 8px 15px;
     font-size: 12px;
+    color: white;
 }
 
 /* Animations */
@@ -248,12 +278,13 @@ button:hover {
     border-radius: 8px;
     margin: 10px 0;
     font-weight: bold;
+    background-color: #FFC64A;
 }
 
 .success {
     background: rgba(76, 175, 80, 0.2);
-    border: 1px solid #4CAF50;
-    color: #4CAF50;
+    border: 1px solid #FFC64A;
+    color: #FFC64A;
 }
 
 .error {

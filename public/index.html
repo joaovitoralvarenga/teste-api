@@ -7,20 +7,31 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1> Sistema de Produtos - API Node.js</h1>
-        
-        <!-- Seção de Login -->
-        <div class="login-section" id="loginSection">
-            <h2> Login</h2>
-            <form id="loginForm">
-                <input type="text" id="username" placeholder="Usuário (admin ou user)" required>
-                <input type="password" id="password" placeholder="Senha (1234)" required>
-                <button type="submit">Entrar</button>
-            </form>
-            <p class="hint">💡 Valores de teste: <strong>admin/1234</strong> (admin) ou <strong>user/1234</strong> (usuário)</p>
-        </div>
 
+    <div class="header">
+        <h1>Sistema de Produtos</h1>
+    </div>
+
+    <p>Aplicação com foco no teste do consumo de API desenvolvida em Node e Express</p>
+   
+    <div class="container">
+        <!-- Container com duas colunas para login e imagem -->
+        <div class="login-container">
+            <!-- Seção de Login (esquerda) -->
+            <div class="login-section" id="loginSection">
+                <h2>Login</h2>
+                <form id="loginForm">
+                    <input type="text" id="username" placeholder="Usuário (admin ou user)" required>
+                    <input type="password" id="password" placeholder="Senha (1234)" required>
+                    <button type="submit">Entrar</button>
+                </form>
+                <p class="hint">💡 Valores de teste: <strong>admin/1234</strong> (admin) ou <strong>user/1234</strong> (usuário)</p>
+            </div>
+
+            <!-- Lado da Imagem (direita) -->
+            <div class="image-side"></div>
+        </div>
+        
         <!-- Seção do Dashboard (aparece após login) -->
         <div class="dashboard" id="dashboard" style="display: none;">
             <div class="user-info">
@@ -28,11 +39,7 @@
                 <button onclick="logout()" class="logout-btn">Sair</button>
             </div>
 
-            <!-- Status da API -->
-            <div class="status" id="status">
-                <p class="loading">🔄 Verificando status da API...</p>
-            </div>
-
+         
             <!-- Formulário de Produto (só para admin) -->
             <div class="product-form" id="productForm" style="display: none;">
                 <h3>➕ Adicionar Produto</h3>
