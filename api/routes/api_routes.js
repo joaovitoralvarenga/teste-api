@@ -175,35 +175,34 @@ apiRouter.post (endpoint + 'seguranca/register', (req, res) => {
 
 
 apiRouter.post(endpoint + 'seguranca/login', (req, res) => {
-    knex
-        .select('*').from('usuario').where( { login: req.body.login })
-        .then( usuarios => {
-            if(usuarios.length){
-                let usuario = usuarios[0]
-                let checkSenha = bcrypt.compareSync (req.body.senha, usuario.senha)    //Middleware relativo a funcionalidade do login.
-                if (checkSenha) {
+    knex.select('*').from('usuario').where({ login: req.body.login })
+    .then(usuarios => {
+        if(usuarios.length){
+            let usuario = usuarios[0]
+            let checkSenha = bcrypt.compareSync(req.body.senha, usuario.senha)
+            if (checkSenha) {
                 var tokenJWT = jwt.sign({ id: usuario.id },
                     process.env.SECRET_KEY, {
-                    expiresIn: 3600
+                        expiresIn: 3600
                     })
-                res.status(200).json ({
+                res.status(200).json({
                     id: usuario.id,
                     login: usuario.login,
                     nome: usuario.nome,
                     roles: usuario.roles,
                     token: tokenJWT
-                    })
-                    return
-                }
+                })
+                return
             }
-            res.status(200).json({ message: 'Login ou senha incorretos' })
+        }
+        res.status(401).json({ message: 'Login ou senha incorretos' })
     })
-    .catch (err => {
+    .catch(err => {
         res.status(500).json({
-            message: 'Erro ao verificar login - ' + err.message })
+            message: 'Erro ao verificar login - ' + err.message 
+        })
     })
 })
-
 
 
 
