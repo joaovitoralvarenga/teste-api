@@ -1,27 +1,93 @@
-const db_produtos = {
-    produtos: [
-        { id: 1, descricao: "Arroz parboilizado 5Kg", valor: 25.00, marca: "Tio João" },
-        { id: 2, descricao: "Maionese 250gr", valor: 7.20, marca: "Helmans" },
-        { id: 3, descricao: "Iogurte Natural 200ml", valor: 2.50, marca: "Itambé" },
-        { id: 4, descricao: "Batata Maior Palha 300gr", valor: 15.20, marca: "Chipps" },
-        { id: 5, descricao: "Nescau 400gr", valor: 8.00, marca: "Nestlé" },
-    ]
-}
-
 const express = require ('express')
 let apiRouter = express.Router()
 
 const endpoint = '/'
-const lista_produtos = {
-    produtos: [
-        { id: 1, descricao: "Produto 1", valor: 5.00, marca: "marca " },
-        { id: 2, descricao: "Produto 2", valor: 5.00, marca: "marca " },
-        { id: 3, descricao: "Produto 3", valor: 5.00, marca: "marca " },
-    ]
-}
-apiRouter.get (endpoint + 'produtos', function (req, res) {
-res.status(200).json (lista_produtos)
+
+const knex = require('knex')({
+    client : 'pg',
+    debug: true,
+    connection : {
+        connectionString: process.env.DATABASE_URL,                           //Requisição para conexão ao banco de dados, passando as credencias por parâmetro
+        ssl: {rejectUnauthorized: false},
+    }
+});
+
+apiRouter.get(endpoint + 'produtos', (req, res) => {
+    knex.select('*').from('produto')
+    .then( produtos => res.status(200).json(produtos) )                       //Rota GET, utilizada para obter informações de um produto.
+    .catch(err => {
+        res.status(500).json({
+            message: 'Erro ao recuperar produtos - ' + err.message })
+    })
 })
+
+apiRouter.get(endpoint + 'produtos/:id', checkToken, (req, res) => {
+    knex.select('*').from('produto').where({ id: req.params.id })         
+    .then(produtos => {
+        if (produtos.length > 0) {                                            //Rota GET, para obter um produto a partir do ID
+            res.status(200).json(produtos[0])
+        } else {
+            res.status(404).json({ message: 'Produto não encontrado' })
+        }
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: 'Erro ao recuperar produto - ' + err.message 
+        })
+    })
+})
+
+apiRouter.post(endpoint + 'produtos', checkToken, isAdmin, (req, res) => {   //Rota POST, para a criação de um produto, apenas admins tem acesso a ela.
+    knex('produto')
+    .insert({
+        descricao: req.body.descricao,
+        valor: req.body.valor,
+        marca: req.body.marca
+    }, ['id'])
+    .then(result => {
+        let produto = result[0]
+        res.status(201).json({ id: produto.id })
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: 'Erro ao criar produto - ' + err.message 
+        })
+    })
+})
+
+apiRouter.put(endpoint + 'produtos/:id', checkToken, isAdmin, (req, res) => {  //Rota PUT, para atualização dos dados de um produto já existente. Apenas admins tem acesso a mesma.
+    knex('produto')
+    .where({ id: req.params.id })
+    .update({
+        descricao: req.body.descricao,
+        valor: req.body.valor,
+        marca: req.body.marca
+    })
+    .then(() => {
+        res.status(200).json({ message: 'Produto atualizado com sucesso' })
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: 'Erro ao atualizar produto - ' + err.message 
+        })
+    })
+})
+
+apiRouter.delete(endpoint + 'produtos/:id', checkToken, isAdmin, (req, res) => {  //Rota DELETE, remove uma instância e suas informações do banco de dados.
+    knex('produto')
+    .where({ id: req.params.id })
+    .del()
+    .then(() => {
+        res.status(200).json({ message: 'Produto deletado com sucesso' })
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: 'Erro ao deletar produto - ' + err.message 
+        })
+    })
+})
+
+
 
 
 
