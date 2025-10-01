@@ -1,4 +1,6 @@
 const express = require ('express')
+const bycrypt = require('bycryptjs')
+const jwt = require('jsonwebtoken')
 let apiRouter = express.Router()
 
 const endpoint = '/'
@@ -12,7 +14,7 @@ const knex = require('knex')({
     }
 });
 
-apiRouter.get(endpoint + 'produtos', (req, res) => {
+apiRouter.get(endpoint + 'produtos', checkToken, (req, res) => {
     knex.select('*').from('produto')
     .then( produtos => res.status(200).json(produtos) )                       //Rota GET, utilizada para obter informações de um produto.
     .catch(err => {
@@ -21,7 +23,7 @@ apiRouter.get(endpoint + 'produtos', (req, res) => {
     })
 })
 
-apiRouter.get(endpoint + 'produtos/:id', (req, res) => {
+apiRouter.get(endpoint + 'produtos/:id', checkToken,(req, res) => {
     knex.select('*').from('produto').where({ id: req.params.id })         
     .then(produtos => {
         if (produtos.length > 0) {                                            //Rota GET, para obter um produto a partir do ID
@@ -37,7 +39,7 @@ apiRouter.get(endpoint + 'produtos/:id', (req, res) => {
     })
 })
 
-apiRouter.post(endpoint + 'produtos',  (req, res) => {   //Rota POST, para a criação de um produto, apenas admins tem acesso a ela.
+apiRouter.post(endpoint + 'produtos', checkToken, isAdmin, (req, res) => {   //Rota POST, para a criação de um produto, apenas admins tem acesso a ela.
     knex('produto')
     .insert({
         descricao: req.body.descricao,
@@ -55,7 +57,7 @@ apiRouter.post(endpoint + 'produtos',  (req, res) => {   //Rota POST, para a cri
     })
 })
 
-apiRouter.put(endpoint + 'produtos/:id', (req, res) => {  //Rota PUT, para atualização dos dados de um produto já existente. Apenas admins tem acesso a mesma.
+apiRouter.put(endpoint + 'produtos/:id', checkToken, isAdmin, (req, res) => {  //Rota PUT, para atualização dos dados de um produto já existente. Apenas admins tem acesso a mesma.
     knex('produto')
     .where({ id: req.params.id })
     .update({
@@ -73,7 +75,7 @@ apiRouter.put(endpoint + 'produtos/:id', (req, res) => {  //Rota PUT, para atual
     })
 })
 
-apiRouter.delete(endpoint + 'produtos/:id', (req, res) => {  //Rota DELETE, remove uma instância e suas informações do banco de dados.
+apiRouter.delete(endpoint + 'produtos/:id', checkToken, isAdmin, (req, res) => {  //Rota DELETE, remove uma instância e suas informações do banco de dados.
     knex('produto')
     .where({ id: req.params.id })
     .del()
@@ -86,6 +88,111 @@ apiRouter.delete(endpoint + 'produtos/:id', (req, res) => {  //Rota DELETE, remo
         })
     })
 })
+
+
+
+
+
+
+
+
+
+apiRouter.post (endpoint + 'seguranca/register', (req, res) => {
+    knex ('usuario')
+        .insert({
+        nome: req.body.nome,
+        login: req.body.login,
+        senha: bcrypt.hashSync(req.body.senha, 8),
+        email: req.body.email
+        }, ['id'])
+        .then((result) => {
+        let usuario = result[0]                                                  //Middleware para registro de novos usuários na aplicação.
+        res.status(200).json({"id": usuario.id })
+        return
+        })
+        .catch(err => {
+        res.status(500).json({
+        message: 'Erro ao registrar usuario - ' + err.message })
+        })
+})
+
+
+
+apiRouter.post(endpoint + 'seguranca/login', (req, res) => {
+    knex
+        .select('*').from('usuario').where( { login: req.body.login })
+        .then( usuarios => {
+            if(usuarios.length){
+                let usuario = usuarios[0]
+                let checkSenha = bcrypt.compareSync (req.body.senha, usuario.senha)    //Middleware relativo a funcionalidade do login.
+                if (checkSenha) {
+                var tokenJWT = jwt.sign({ id: usuario.id },
+                    process.env.SECRET_KEY, {
+                    expiresIn: 3600
+                    })
+                res.status(200).json ({
+                    id: usuario.id,
+                    login: usuario.login,
+                    nome: usuario.nome,
+                    roles: usuario.roles,
+                    token: tokenJWT
+                    })
+                    return
+                }
+            }
+            res.status(200).json({ message: 'Login ou senha incorretos' })
+    })
+    .catch (err => {
+        res.status(500).json({
+            message: 'Erro ao verificar login - ' + err.message })
+    })
+})
+
+let checkToken = (req, res, next) => {
+    let authToken = req.headers["authorization"]
+    if (!authToken) {
+        res.status(401).json({ message: 'Token de acesso requerida' })
+    }
+    else {
+        let token = authToken.split(' ')[1]
+        req.token = token
+    }
+
+    jwt.verify(req.token, process.env.SECRET_KEY, (err, decodeToken) => {
+        if (err) {
+            res.status(401).json({ message: 'Acesso negado'})
+            return
+        }
+        req.usuarioId = decodeToken.id
+        next()
+    })
+}
+
+let isAdmin = (req, res, next) => {
+    knex
+        .select ('*').from ('usuario').where({ id: req.usuarioId })
+        .then ((usuarios) => {
+            if (usuarios.length) {
+                let usuario = usuarios[0]
+                let roles = usuario.roles.split(';')
+                let adminRole = roles.find(i => i === 'ADMIN')
+                if (adminRole === 'ADMIN') {
+                    next()
+                    return
+                }
+                else {
+                    res.status(403).json({ message: 'Role de ADMIN requerida' })
+                    return
+                }
+            }
+        })
+        .catch (err => {
+        res.status(500).json({
+        message: 'Erro ao verificar roles de usuário - ' + err.message })
+        })
+}
+
+
 
 
 
