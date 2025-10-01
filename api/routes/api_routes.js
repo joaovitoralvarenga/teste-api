@@ -53,7 +53,7 @@ let isAdmin = (req, res, next) => {
                     return
                 }
             } else {
-                req.status(404).json({message: 'Usuário não encontrado'})
+                res.status(404).json({message: 'Usuário não encontrado'})
             }
         })
         .catch (err => {
