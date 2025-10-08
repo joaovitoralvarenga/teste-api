@@ -3,6 +3,11 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 let apiRouter = express.Router()
 
+apiRouter.use(express.json())
+apiRouter.use(express.urlencoded({ extended: true }))
+
+require('dotenv').config()
+
 const endpoint = '/'
 
 const knex = require('knex')({
