@@ -185,7 +185,7 @@ apiRouter.post(endpoint + 'seguranca/login', (req, res) => {
         .then( usuarios => {
             if(usuarios.length){
                 let usuario = usuarios[0]
-                let checkSenha = bcrypt.compareSync (req.body.senha, usuario.senha)    //Middleware relativo a funcionalidade do login.
+                let checkSenha = bcrypt.compareSync (req.body.senha, usuario.senha)
                 if (checkSenha) {
                 var tokenJWT = jwt.sign({ id: usuario.id },
                     process.env.SECRET_KEY, {
@@ -201,14 +201,13 @@ apiRouter.post(endpoint + 'seguranca/login', (req, res) => {
                     return
                 }
             }
-             res.status(401).json({ message: 'Login ou senha incorretos' })
+            res.status(200).json({ message: 'Login ou senha incorretos' })
     })
     .catch (err => {
         res.status(500).json({
             message: 'Erro ao verificar login - ' + err.message })
     })
 })
-
 
 
 
